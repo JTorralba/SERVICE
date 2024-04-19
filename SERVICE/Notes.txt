@@ -1,0 +1,20 @@
+﻿TODO:
+
+- implement Serilog.Settings.Configuration
+- implement SignalR
+- implement Windows Service
+
+
+PROJECT:
+
+AOT enabled
+
+
+PUBLISH:
+
+Release | Any CPU
+Net 8.0
+Self-Contained
+Win-X64
+Enable ReadyToRun Compilation
+Trim Unused Code (already checked and uncheckable)
