@@ -1,8 +1,7 @@
 ﻿TODO:
 
-- implement Serilog.Settings.Configuration
-- implement SignalR
-- implement Windows Service
+SignalR
+Windows Service
 
 
 PROJECT:
