@@ -1,5 +1,6 @@
 ﻿using Standard;
 using System;
+using System.IO;
 using System.Reflection;
 
 namespace MULTIMODE
@@ -14,9 +15,18 @@ namespace MULTIMODE
 
         public void Initialize()
         {
+
+            string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
             string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
-            Console.SetOut(new DualWriter($"C:\\Temp\\{assemblyName}.log"));
+            string assemblyLogPath = $"{assemblyPath}\\log";
+
+            string assemblyLogName = $"{assemblyLogPath}\\{assemblyName}.log";
+
+            Directory.CreateDirectory(@assemblyLogPath);
+
+            Console.SetOut(new DualWriter($"{assemblyLogName}"));
 
             logQueue = new FIFO<Data<object>>(LogQueueItem, LogQueueStatus);
 
