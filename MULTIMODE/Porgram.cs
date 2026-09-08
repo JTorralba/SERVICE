@@ -7,8 +7,6 @@ namespace MULTIMODE
 {
     static class Porgram
     {
-        public static bool Test;
-
         static void Main(string[] args)
         {
             string mode = args.Length > 0 ? args[0].ToLower() : "-cli";
