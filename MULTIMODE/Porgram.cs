@@ -1,7 +1,13 @@
-﻿using System;
+﻿
+using System;
+using System.IO;
+using System.Reflection;
 using System.ServiceProcess;
 using System.Windows.Forms;
+
 using Application = System.Windows.Forms.Application;
+
+using Standard;
 
 namespace MULTIMODE
 {
@@ -10,6 +16,35 @@ namespace MULTIMODE
         static void Main(string[] args)
         {
             string mode = args.Length > 0 ? args[0].ToLower() : "-cli";
+
+            string assemblyFileDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            string assemblyFileName = Assembly.GetExecutingAssembly().GetName().Name;
+
+            string logFileDirectory = $"{assemblyFileDirectory}\\logs";
+
+            string logFileName = string.Empty;
+
+            switch (mode)
+            {
+                case "-cli":
+                    logFileName = $"CLI.log";
+                    break;
+
+                case "-gui":
+                    logFileName = $"GUI.log";
+                    break;
+
+                case "-svc":
+                    logFileName = $"SVC.log";
+                    break;
+            }           
+
+            string logFile = Path.Combine(logFileDirectory, logFileName);
+
+            Directory.CreateDirectory(@logFileDirectory);
+
+            Console.SetOut(new DualWriter($"{logFile}"));
 
             switch (mode)
             {
@@ -36,7 +71,7 @@ namespace MULTIMODE
 
     static class CLI
     {
-        private static ConsoleKeyInfo keyInfo;
+        private static ConsoleKeyInfo consoleKeyInfo;
 
         private static bool active;
 
@@ -50,9 +85,9 @@ namespace MULTIMODE
 
             do
             {
-                keyInfo = Console.ReadKey(intercept: true);
+                consoleKeyInfo = Console.ReadKey(intercept: true);
 
-                if (keyInfo.Key == ConsoleKey.X)
+                if (consoleKeyInfo.Key == ConsoleKey.X)
                 {
                     if (active)
                     {
@@ -61,7 +96,7 @@ namespace MULTIMODE
                 }
                 else
                 {
-                    if (keyInfo.Key == ConsoleKey.S)
+                    if (consoleKeyInfo.Key == ConsoleKey.S)
                     {
                         active = !active;
 
@@ -75,7 +110,7 @@ namespace MULTIMODE
                         }
                     }
                 }
-            } while (keyInfo.Key != ConsoleKey.X);
+            } while (consoleKeyInfo.Key != ConsoleKey.X);
         }
     }
 
@@ -85,7 +120,7 @@ namespace MULTIMODE
 
         private static Service service;
 
-        private readonly Button _startstop = new Button { Text = "Start", Dock = DockStyle.Top };
+        private static Button _startstop = new Button { Text = "Start", Dock = DockStyle.Top };
 
         public GUI()
         {
@@ -93,7 +128,7 @@ namespace MULTIMODE
 
             service = new Service();
 
-            Text = "GUI";
+            Text = "MULTIMODE";
 
             Controls.Add(_startstop);
 
@@ -110,6 +145,7 @@ namespace MULTIMODE
                 else
                 {
                     service.Initialize();
+
                     _startstop.Text = "Stop";
                 }
             };
@@ -131,7 +167,7 @@ namespace MULTIMODE
 
         public SVC()
         {
-            ServiceName = "SVC";
+            ServiceName = "MULTIMODE";
             CanStop = true;
             CanPauseAndContinue = false;
             AutoLog = true;
