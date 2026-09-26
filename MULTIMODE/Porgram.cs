@@ -25,20 +25,7 @@ namespace MULTIMODE
 
             string logFileName = string.Empty;
 
-            switch (mode)
-            {
-                case "-cli":
-                    logFileName = $"CLI.log";
-                    break;
-
-                case "-gui":
-                    logFileName = $"GUI.log";
-                    break;
-
-                case "-svc":
-                    logFileName = $"SVC.log";
-                    break;
-            }           
+            logFileName = $"{assemblyFileName}.log";
 
             string logFile = Path.Combine(logFileDirectory, logFileName);
 

@@ -35,8 +35,6 @@ namespace Standard
 
         private Mutex fileMutex;
 
-        //private FileStream _fileStream;
-
         private readonly ConcurrentQueue<string> _queue = new ConcurrentQueue<string>();
 
         private readonly AutoResetEvent _signal = new AutoResetEvent(false);
@@ -89,39 +87,22 @@ namespace Standard
 
                 while (_queue.TryDequeue(out var item))
                 {
-                    fileMutex.WaitOne();
-
-                    Rotate(file);
-
-                    byte[] utf8Bytes = Encoding.UTF8.GetBytes(item);
-
-                    bool Wrote = false;
-
-                    while (!Wrote)
+                    if (fileMutex.WaitOne(TimeSpan.FromMilliseconds(75)))
                     {
+                        Rotate(file);
+
                         try
                         {
-                            //_fileStream = new FileStream(file, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite, bufferSize: 32768, useAsync: false);
-
-                            //_fileStream.Lock(0, 0);
-                            //_fileStream.Position = _fileStream.Length;
-                            //_fileStream.Write(utf8Bytes, 0, utf8Bytes.Length);
-                            //_fileStream.Flush();
-                            //_fileStream.Unlock(0, 0);
-                            //_fileStream.Close();
-                            //_fileStream.Dispose();
-
                             File.AppendAllText(file, item);
-
-                            Wrote = true;
                         }
                         catch (Exception e)
                         {
-                            Thread.Sleep(250);
+                        }
+                        finally
+                        {
+                            fileMutex.ReleaseMutex();
                         }
                     }
-
-                    fileMutex.ReleaseMutex();
                 }
             }
         }
@@ -228,10 +209,6 @@ namespace Standard
 
         public void Dispose()
         {
-            //_fileStream.Flush();
-            //_fileStream.Close();
-            //_fileStream.Dispose();
-
             _cts.Cancel();
             _signal.Set();
             _task.Wait();
@@ -251,8 +228,8 @@ namespace Standard
             // Keep original console output.
             _consoleWriter = Console.Out;
 
-            int megaBytes = 0;
-            int kiloBytes = 16;
+            int megaBytes = 1;
+            int kiloBytes = 0;
             int bytes = 0;
 
             int days = 365;
@@ -337,7 +314,7 @@ namespace Standard
 
                 _item($"{data}");
 
-                Thread.Sleep(250);
+                Thread.Sleep(25);
 
                 i++;
             }
